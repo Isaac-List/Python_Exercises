@@ -70,7 +70,7 @@ def save_chain_model(chain: dict, starts: list, filename: str) -> None:
 
     try:
         with open(filename, 'w') as output_file:
-            json.dump(save_to_json, output_file)
+            json.dump(save_to_json, output_file, indent = 4)
         print(f"Chain model saved to {filename}")
     except:
         print(f"Failed to save chain model to {filename}")
@@ -83,7 +83,8 @@ def load_chain_model(filename: str) -> tuple[dict, list]:
     # Convert string representations of tuples back to tuples
     chain_model: dict = {ast.literal_eval(key): value for key, value in data["model"].items()}
 
-    starts: list = data["starts"]
+    # Convert list representation of start tuples back into tuples
+    starts: list = [tuple(s) for s in data["starts"]]
 
     return chain_model, starts
 
