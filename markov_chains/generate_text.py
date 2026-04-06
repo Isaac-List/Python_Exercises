@@ -40,7 +40,7 @@ print(f"Generating text with length of {args.length}")
 generated_text = markov.generate_text_from_chain(model, starts, args.length)
 
 # Save generated text to file
-print(f"Saving output to {args.output")
+print(f"Saving output to {args.output}")
 try:
     with open(args.output, "w") as output_file:
         output_file.write(generated_text)
