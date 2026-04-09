@@ -14,3 +14,5 @@ A program to detect if a text snippet is a haiku, and if it
 is, format it correctly.
 
 ### Markov Chains
+A Markov Chain generator, the results of which can be used to
+generate random text.
