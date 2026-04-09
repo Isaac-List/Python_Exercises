@@ -6,6 +6,8 @@ Small python projects.
 
 ### Wordle
 
+A CLI Wordle game in Python
+
 ### Haiku Detector
 
 ### Markov Chains
