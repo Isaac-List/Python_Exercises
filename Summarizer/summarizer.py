@@ -3,7 +3,7 @@ Program to summarize a text by keeping sentences which hold a high number
 of significant words and fewer stop words.
 """
 
-import re, math, statistics
+import re, statistics, argparse
 
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize
@@ -49,15 +49,19 @@ def score_sentence(text: str, frequency_map: dict) -> float:
     of each word it contains, returning a single numerical value
     """
     total_score: float = 0.0
-
+    tokenized_text: list = tokenize_text(text)
+    
     # Build score, handle KeyError for stopwords by adding 0
-    for word in tokenize_text(text):
+    for word in tokenized_text:
         try:
             total_score += frequency_map[word]
         except KeyError:
             total_score += 0
 
-    return total_score
+    # Make score proportional to sentence length
+    average_score: float = total_score / len(tokenized_text)
+
+    return average_score
 
 def summarizer(text: str, frequencies: dict) -> str:
     """
@@ -80,14 +84,14 @@ def summarizer(text: str, frequencies: dict) -> str:
     #     print(f"{sentences_list[i]} = {score_list[i]}")
     
     # Rebuild text with only sentences of higher than median importance
-    summarized_text: str = ""
-    median_score: int = math.floor(statistics.median(score_list))
+    summarized_text_list: list = []
+    median_score: int = statistics.median(score_list)
 
     for idx in range(len(score_list)):
         if score_list[idx] >= median_score:
-            summarized_text = summarized_text + " " + sentences_list[idx]
+            summarized_text_list.append(sentences_list[idx])
 
-    return summarized_text
+    return " ".join(summarized_text_list)
 
 if __name__ == "__main__":
     # Sample text
@@ -132,7 +136,38 @@ if __name__ == "__main__":
         Upon the seat
         Of a bicycle built for two.
     """
-    list_of_words: list = tokenize_text(sample)
+
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description="Use extractive summarization to summarize a source text"
+    )
+    
+    parser.add_argument(
+        "filepath",
+        type = str,
+        help = "Path to the source .txt file"
+    )
+    
+    # Accept optional output_file argument with flags, defaults to model.json
+    parser.add_argument(
+        "-o",
+        "--output",
+        type = str,
+        default = "summary.txt",
+        help = "Location of summary output (default to summary.txt)"
+    )
+
+    args = parser.parse_args()
+
+    # Read in text, or fall back to sample text
+    try:
+        with open(args.filepath, "r", encoding="utf-8") as source:
+            source_text = source.read()
+    except FileNotFoundError:
+        print(f"Error: File {args.filepath} could not be read. Defaulting to sample text.")
+        source_text = sample
+
+    list_of_words: list = tokenize_text(source_text)
 
     freq_map: dict = build_frequency_map(list_of_words)
 
